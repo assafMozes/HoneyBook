@@ -10,6 +10,8 @@ public class AsosTest {
             lastName = RandomString.randomString(8, false),
             emailAdress = firstName + "-" + lastName + "@honeybook.com",
             asosPassword = RandomString.randomString(10, true);
+    MainPage mainPage;
+    JoinPage joinPage;
 
     @Before
     public void setup() {
@@ -18,18 +20,20 @@ public class AsosTest {
         //Assume skips the test if no driver was created
         Assume.assumeNotNull(driver);
         driver.get("http://www.asos.com");
-    }
 
-    @Test
-    public void asosTest() throws InterruptedException {
-        MainPage mainPage = new MainPage(driver);
+        mainPage = new MainPage(driver);
         Assume.assumeTrue(mainPage.isHomePage()); //skips the test if we got to the wrong page
 
         mainPage.clickMyAccountIcon();
         mainPage.clickJoin();
 
-        JoinPage joinPage = new JoinPage(driver);
+        joinPage = new JoinPage(driver);
         Assume.assumeTrue(joinPage.isJoinPage()); //skips the test if we got to the wrong page
+    }
+
+
+    @Test
+    public void joinTest() throws InterruptedException {
 
         joinPage.fillEmail(emailAdress);
         joinPage.fillFirstName(firstName);
@@ -50,8 +54,97 @@ public class AsosTest {
 
     }
 
-    @After
-    public void tearDown() {
+    @Test
+    public void joinWithoutEmailTest() throws InterruptedException {
+        joinPage.fillFirstName(firstName);
+        joinPage.fillLastName(lastName);
+        joinPage.filPassword(asosPassword);
+        joinPage.fillBirthDay(1);
+        joinPage.fillBirthMonth("January");
+        joinPage.fillBirthYear(1900);
+        joinPage.chooseGender(Math.round(Math.random()));
+        joinPage.clickJoinAsos();
+
+        Assert.assertTrue(joinPage.isJoinPage());
+        Assert.assertTrue(joinPage.getEmailError().contains("Oops! You need to type your email here"));
+//        additional assertion to the DB
+//        Assert.assertFalse(DB.isUserExist(emailAdress));
+    }
+
+    @Test
+    public void joinWithInvalidEmailTest() throws InterruptedException {
+        joinPage.fillEmail(firstName);
+        joinPage.fillFirstName(firstName);
+        joinPage.fillLastName(lastName);
+        joinPage.filPassword(asosPassword);
+        joinPage.fillBirthDay(1);
+        joinPage.fillBirthMonth("January");
+        joinPage.fillBirthYear(1900);
+        joinPage.chooseGender(Math.round(Math.random()));
+        joinPage.clickJoinAsos();
+
+        Assert.assertTrue(joinPage.isJoinPage());
+        Assert.assertTrue(joinPage.getEmailError().contains("Email fail! Please type in your correct email address"));
+//        additional assertion to the DB
+//        Assert.assertFalse(DB.isUserExist(emailAdress));
+    }
+
+    @Test
+    public void joinWithoutFirstNameTest() throws InterruptedException {
+        joinPage.fillEmail(emailAdress);
+        joinPage.fillLastName(lastName);
+        joinPage.filPassword(asosPassword);
+        joinPage.fillBirthDay(1);
+        joinPage.fillBirthMonth("January");
+        joinPage.fillBirthYear(1900);
+        joinPage.chooseGender(Math.round(Math.random()));
+        joinPage.clickJoinAsos();
+
+        Assert.assertTrue(joinPage.isJoinPage());
+        Assert.assertTrue(joinPage.getFirstNameError().contains("We need your first name"));
+//        additional assertion to the DB
+//        Assert.assertFalse(DB.isUserExist(emailAdress));
+    }
+
+    @Test
+    public void joinWithoutbirthDayTest() throws InterruptedException {
+        joinPage.fillEmail(emailAdress);
+        joinPage.fillFirstName(firstName);
+        joinPage.fillLastName(lastName);
+        joinPage.filPassword(asosPassword);
+        joinPage.fillBirthMonth("January");
+        joinPage.fillBirthYear(1900);
+        joinPage.chooseGender(Math.round(Math.random()));
+        joinPage.clickJoinAsos();
+
+        Assert.assertTrue(joinPage.isJoinPage());
+        Assert.assertTrue(joinPage.getBirthDayError().contains("Enter your full date of birth"));
+//        additional assertion to the DB
+//        Assert.assertFalse(DB.isUserExist(emailAdress));
+    }
+
+    @Test
+    public void joinWithInvalidDateTest() throws InterruptedException {
+        joinPage.fillEmail(emailAdress);
+        joinPage.fillFirstName(firstName);
+        joinPage.fillLastName(lastName);
+        joinPage.filPassword(asosPassword);
+        joinPage.fillBirthDay(29);
+        joinPage.fillBirthMonth("February");
+        joinPage.fillBirthYear(1900);
+        joinPage.chooseGender(Math.round(Math.random()));
+        joinPage.clickJoinAsos();
+
+        Assert.assertTrue(joinPage.isJoinPage());
+        Assert.assertTrue(joinPage.getBirthDayError().contains("Add your date of birth to get a birthday treat"));
+//        additional assertion to the DB
+//        Assert.assertFalse(DB.isUserExist(emailAdress));
+    }
+
+
+        @After
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(10000);
         if (driver != null)
             driver.quit();
     }

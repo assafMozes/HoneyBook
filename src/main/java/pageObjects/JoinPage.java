@@ -55,4 +55,15 @@ public class JoinPage {
     public void clickJoinAsos(){
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[type='submit']"))).click();
     }
+    public String getEmailError(){
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Email-error"))).getText();
+    }
+    public String getFirstNameError(){
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("FirstName-error"))).getText();
+    }
+
+    public String getBirthDayError(){
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("BirthDay-error"))).getText();
+    }
+
 }
